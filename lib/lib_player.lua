@@ -1,5 +1,3 @@
-local redis = require "lib_redis"
-
 local Player = {
     uid = 0,
     nickname = 0,
@@ -19,7 +17,7 @@ function Player:register(uid)
     p.uid = uid
     p.gold = 1000
     p.sex = 0
-    redis:hmset("player:uid:" .. p.uid, "uid" , p.uid, "gold" : p.gold, "sex" : p.sex)
+    redis:hmset("player:uid:" .. p.uid, "uid" , p.uid, "gold" , p.gold, "sex" , p.sex)
 end
 
 function Player:load(uid)
