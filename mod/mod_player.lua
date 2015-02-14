@@ -1,31 +1,20 @@
 local snax = require "snax"
 
-local player = { uid = 0}
+local player = {uid = 0}
 
-function init()
-    -- init player  
-    print("init player")  
+function init( p)
+    player = p
 end
 
-function exit()
-    
+function exit( )
+    player = {}
 end
 
-function response.load_from_redis(uid)
-    -- body
+function response.get()
+    return player
+end
+
+function response.set(p)
+    player = p
     return true
-end
-
-function response.register(uid)
-    return true
-end
-
-function reaspone.acquice_items(items)
-    -- body
-    return true
-end
-
-function response.hello( ... )
-    -- body
-    print(uid, "hello")
 end
