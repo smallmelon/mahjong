@@ -1,5 +1,4 @@
 local skynet = require "skynet"
-local redis = require "redis"
 local string = require "string"
 local snax = require "snax"
 
@@ -41,17 +40,27 @@ end
 function Redis:init(cf)
     cf = cf or conf
     for i=1, #cf do
-        local db = snax.newservice("mod_redis", cf[i])
-        self.db_pool[i] = db
+        local dbs = {}
+        for j= 1, 10 do
+            local db = snax.newservice("mod_redis", cf[i])
+            dbs[j] = db
+        end
+        self.db_pool[i] = dbs
     end
-
 end
 
 setmetatable(Redis, { __index = function (t, k)
     local cmd = string.lower(k)
     local f = function (self, ... )
-        local db = self:choice_db(...)
-        return db.req.cmd(cmd, ...)
+        local dbs = self:choice_db(...)
+        if #dbs > 0 then
+            local db = table.remove(dbs, 1)
+            local rs = db.req.cmd(cmd, ...)
+            table.insert(dbs, db)
+            return rs
+        end
+        skynet.sleep(0.01)
+        return f(self, ...)
     end
     t[k] = f
     return f
