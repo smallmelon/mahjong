@@ -1,5 +1,6 @@
 root = "./"
 thread = 8
+--logger = "./mahjong/logs/skynet-error.log"
 logger = nil
 logpath = "."
 harbor = 1
