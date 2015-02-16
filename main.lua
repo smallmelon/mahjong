@@ -13,6 +13,8 @@ skynet.start(function ()
     redis:init()
     mysql:init()
 
+    test_logger:test()
+    
     local watchdog = skynet.newservice("watchdog")
     skynet.call(watchdog, "lua", "start", {
         port = 10086,
