@@ -5,7 +5,7 @@ local test = {}
 
 function  test:test( ... )
     log = logger:new("./mahjong/logs/test")
-    log:set_level(0)
+    log:set_level(4)
     while (1) do
         log:debug("debug log")
         log:warn("warn log")

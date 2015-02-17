@@ -4,37 +4,39 @@ local socket = require "socket"
 local sproto = require "sproto"
 local bit32 = require "bit32"
 
+-- request process
+local pp_player = require "pp_player"
+local pp_game = require "pp_game"
+
 local host
 local send_request
 
 local CMD = {}
-local REQUEST = {}
+local REQUEST
 local client_fd
 
-
-local player = {}
-
-function REQUEST:get()
-    print("get", self.what)
-    local r = skynet.call("SIMPLEDB", "lua", "get", self.what)
-    return { result = r }
-end
-
-function REQUEST:set()
-    print("set", self.what, self.value)
-    local r = skynet.call("SIMPLEDB", "lua", "set", self.what, self.value)
-end
-
-function REQUEST:handshake()
-    return { msg = "Welcome to skynet, I will send heartbeat every 5 sec." }
-end
+local client = {
+    fd = nil,
+    player = nil,
+    auth = false
+}
 
 -- first auth
 -- game process
 
 local function request(name, args, response)
-    local f = assert(REQUEST[name])
-    local r = f(args)
+    local f = REQUEST[name]
+    if not f then
+        if client.auth then
+            REQUEST = pp_game
+            f = assert(REQUEST(name))
+        else
+            print("user not pass auth")
+            socket.close(client_fd)
+            skynet.exit()
+        end
+    end
+    local r = f(args, client) -- args self, clien
     if response then
         return response(r)
     end
@@ -75,6 +77,7 @@ skynet.register_protocol {
 function CMD.start(gate, fd, proto)
     host = sproto.new(proto.c2s):host "package"
     send_request = host:attach(sproto.new(proto.s2c))
+    REQUEST = pp_player
     skynet.fork(function()
         while true do
             send_package(send_request "heartbeat")
@@ -83,6 +86,7 @@ function CMD.start(gate, fd, proto)
     end)
 
     client_fd = fd
+    client.fd = fd
     skynet.call(gate, "lua", "forward", fd)
 end
 

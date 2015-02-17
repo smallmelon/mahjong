@@ -14,19 +14,38 @@ handshake 1 {
     }
 }
 
-get 2 {
+register 4 {
     request {
-        what 0 : string
+        uuid 0 : string
+        device 1 : string
+        channel 2 : integer
     }
     response {
-        result 0 : string
+        uid 0 : integer
+        passwd 1 : string
+        key 2 : string
     }
 }
 
-set 3 {
+login 5 {
     request {
-        what 0 : string
-        value 1 : string
+        uid 0 : integer
+        key 1 : string
+    }
+    response {
+        code 0 : integer
+    }
+}
+
+
+player 6 {
+    request {
+        uid 0 : integer
+    }
+    response {
+        code 0 : integer
+        nickname 1 : string
+        gold 2 : integer
     }
 }
 
