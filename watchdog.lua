@@ -23,11 +23,13 @@ end
 
 function SOCKET.close(fd)
     print("socket close",fd)
+    skynet.call(agent[fd], "lua", "close")
     close_agent(fd)
 end
 
 function SOCKET.error(fd, msg)
     print("socket error",fd, msg)
+    skynet.call(agent[fd], "lua", "close")
     close_agent(fd)
 end
 

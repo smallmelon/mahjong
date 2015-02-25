@@ -81,6 +81,7 @@ function CMD.start(gate, fd, proto)
     skynet.fork(function()
         while true do
             send_package(send_request "heartbeat")
+            print ("heartbeat")
             skynet.sleep(500)
         end
     end)
@@ -89,6 +90,13 @@ function CMD.start(gate, fd, proto)
     client.fd = fd
     skynet.call(gate, "lua", "forward", fd)
 end
+
+function CMD.close( ... )
+    -- client close socket event
+    print("agent client socket close", client_fd)
+    skynet.exit()
+end
+
 
 skynet.start(function()
     skynet.dispatch("lua", function(_,_, command, ...)

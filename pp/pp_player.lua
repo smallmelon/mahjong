@@ -18,6 +18,7 @@ end
 
 
 function Request:handshake()
+    print("handshake")
     return { msg = "Welcome to mj, I will send heartbeat every 5 sec." }
 end
 

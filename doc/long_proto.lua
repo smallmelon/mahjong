@@ -1,8 +1,8 @@
-local sprotoparser = require "sprotoparser"
-
-local proto = {}
-
-proto.c2s = sprotoparser.parse [[
+local proto = { 
+    s2c = nil,
+    c2s = nil
+}
+proto.c2s = [[
 .package {
     type 0 : integer
     session 1 : integer
@@ -25,7 +25,8 @@ login 2 {
 }
 ]]
 
-proto.s2c = sprotoparser.parse [[
+proto.s2c = 
+[[
 .package {
     type 0 : integer
     session 1 : integer
