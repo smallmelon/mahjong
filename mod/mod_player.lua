@@ -1,20 +1,11 @@
 local snax = require "snax"
+local lib_redis = require "lib_redis"
 
-local player = {uid = 0}
+local redis
+local player = {}
 
-function init( p)
-    player = p
+function init(uid)
+    redis = lib_redis:new()
+    -- load data from redis database
 end
 
-function exit( )
-    player = {}
-end
-
-function response.get()
-    return player
-end
-
-function response.set(p)
-    player = p
-    return true
-end

@@ -3,7 +3,7 @@ local snax = require "snax"
 
 local seats = {}
 
-function init()
+function init(cf)
     -- body
 end
 
@@ -13,13 +13,22 @@ function exit()
     end
 end
 
-function response.get_seat()
+function response.acquire()
     if #seats >= 1 then
         return table.remove(seats, 1)
     else
         local seat = snax.newservice("mod_seat")
-        table.insert(seats, seat)
-        return seat
+        table.insert(seats, seat.handle)
+        return handle
     end
 end
 
+
+function accept.release(handle)
+    local seat = snax.bind(handle, "mod_seat")
+    if seat.req.is_empty() then
+        snax.kill(seat)
+    else
+        table.insert(seats, handle)
+    end
+end

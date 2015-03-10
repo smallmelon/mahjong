@@ -19,7 +19,11 @@ function exit()
     -- body
 end
  
---
+
+function response.is_empty()
+    return not next(players)
+end
+
 function response.enter( ... )
     -- body
 end

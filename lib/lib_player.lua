@@ -1,31 +1,47 @@
-local Player = {
-    uid = 0,
-    nickname = 0,
-    gold = 0,
-    sex = 0,
-    sign = ""
+local snax = require "snax"
+
+local player = {
+    player_sup = nil
+    pid = nil
 }
 
-function Player:new(o)
-    o = o or {}
+function player:init()
+    self.player_sup = snax.uniqueservice("mod_player_sup")
+end
+
+function player:new()
+    local o = {}
     setmetatable(o, self)
     self.__index = self
+    o.player_sup = snax.queryservice("mod_player_sup")
+    return o
 end
 
-function Player:register(uid)
-    local p = Player:new()
-    p.uid = uid
-    p.gold = 1000
-    p.sex = 0
-    redis:hmset("player:uid:" .. p.uid, "uid" , p.uid, "gold" , p.gold, "sex" , p.sex)
+
+function player:spawn_player(uid)
+    local handle = self.player_sup.req.spawn_player(uid)
+    if handle then
+        self.pid = snax.bind(handle, "mod_player")
+        return true
+    end
+    return false
 end
 
-function Player:load(uid)
-    local p = Player:new()
-    local rs = redis:hmget("player:uid:" .. uid, "uid", "gold", "sex", "nickname")
-    p.uid = uid
-    return p
-    -- body
+function player:get_player(uid)
+    local handle = self.player_sup.get_player(uid)
+    if handle then
+        self.pid = snax.bind(handle, "mod_player")
+        return true
+    end
+    return false
 end
 
-return Player
+setmetatable(player, {__index = function (t, k)
+    local cmd = string.lower(k)
+    local f = function (self, ... )
+        return self.pid.req[cmd](...)
+    end
+    t[k] = f
+end})
+
+return player

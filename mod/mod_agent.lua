@@ -6,37 +6,42 @@ local bit32 = require "bit32"
 
 -- request process
 local pp_player = require "pp_player"
-local pp_game = require "pp_game"
+local pp_seat = require "pp_seat"
 
 local host
 local send_request
 
 local CMD = {}
-local REQUEST
-local client_fd
+local REQUEST = { PLAYER = pp_player, SEAT = pp_seat} -- process proto array
 
 local client = {
     fd = nil,
     player = nil,
-    auth = false
+    auth = false,
+    seat = nil
 }
 
 -- first auth
 -- game process
 
 local function request(name, args, response)
-    local f = REQUEST[name]
+    local f = REQUEST.PLAYER[name]
     if not f then
         if client.auth then
-            REQUEST = pp_game
-            f = assert(REQUEST(name))
+            f = assert(REQUEST.SEAT[name]) -- seat proto
+            if f then
+                local r = f(client, args)
+                if response then
+                    return response(r)
+                end
+            end                
         else
             print("user not pass auth")
-            socket.close(client_fd)
+            socket.close(client.fd)
             skynet.exit()
         end
     end
-    local r = f(args, client) -- args self, clien
+    local r = f(args) 
     if response then
         return response(r)
     end
@@ -48,7 +53,7 @@ local function send_package(pack)
         string.char(bit32.extract(size,0,8))..
         pack
 
-    socket.write(client_fd, package)
+    socket.write(client.fd, package)
 end
 
 skynet.register_protocol {
@@ -77,7 +82,6 @@ skynet.register_protocol {
 function CMD.start(gate, fd, proto)
     host = sproto.new(proto.c2s):host "package"
     send_request = host:attach(sproto.new(proto.s2c))
-    REQUEST = pp_player
     skynet.fork(function()
         while true do
             send_package(send_request "heartbeat")
@@ -86,14 +90,13 @@ function CMD.start(gate, fd, proto)
         end
     end)
 
-    client_fd = fd
     client.fd = fd
     skynet.call(gate, "lua", "forward", fd)
 end
 
 function CMD.close( ... )
     -- client close socket event
-    print("agent client socket close", client_fd)
+    print("agent client socket close", client.fd)
     skynet.exit()
 end
 
