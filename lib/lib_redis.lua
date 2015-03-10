@@ -1,11 +1,12 @@
 local skynet = require "skynet"
 local string = require "string"
 local snax = require "snax"
+local print_r = require "print_r"
 
 
 
 local Redis = {
-    db_pool = {}
+    redis_sup = nil
 }
 
 local conf = {
@@ -23,40 +24,29 @@ local conf = {
     }
 }
 
-function hash_key(key)
-    local value = 0
-    for i=1, #key do
-        value = value + string.byte(key, i)
-    end
-    return value
-end
 
-function Redis:choice_db(...)
-    local hash_value = hash_key(select(1, ...))
-    return self.db_pool[hash_value % 2 + 1]
+function Redis:new()
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+    
+    o.redis_sup = snax.queryservice("mod_redis_sup")
+    return o
 end
-
 
 function Redis:init(cf)
     cf = cf or conf
-    for i=1, #cf do
-        local dbs = {}
-        for j= 1, 10 do
-            local db = snax.newservice("mod_redis", cf[i])
-            dbs[j] = db
-        end
-        self.db_pool[i] = dbs
-    end
+    self.redis_sup = snax.uniqueservice("mod_redis_sup", cf)
 end
 
 setmetatable(Redis, { __index = function (t, k)
     local cmd = string.lower(k)
-    local f = function (self, ... )
-        local dbs = self:choice_db(...)
-        if #dbs > 0 then
-            local db = table.remove(dbs, 1)
+    local f = function (self,  ... )
+        local handle, pos = self.redis_sup.req.acquire(...)
+        if handle > 0 then
+            local db = snax.bind(handle, "mod_redis")
             local rs = db.req.cmd(cmd, ...)
-            table.insert(dbs, db)
+            self.redis_sup.post.release(handle, pos)
             return rs
         end
         skynet.sleep(0.01)
@@ -67,4 +57,3 @@ setmetatable(Redis, { __index = function (t, k)
 end})
 
 return Redis
-

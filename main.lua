@@ -3,7 +3,7 @@ local snax = require "snax"
 local table = require "table"
 local redis = require "lib_redis"
 local mysql = require "lib_mysql"
-local test_logger = require "test_logger"
+local print_r = require "print_r"
 
 local max_client = 10240
 skynet.start(function ()
@@ -19,6 +19,9 @@ skynet.start(function ()
         maxclient = max_client,
         nodelay = true,
     })
+
+    skynet.kill(skynet.newservice("test_redis"))
+    skynet.kill(skynet.newservice("test_mysql"))
     print("Watchdog listen on ", 10086)
 
     skynet.exit()

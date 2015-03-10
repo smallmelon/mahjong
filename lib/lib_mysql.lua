@@ -1,9 +1,9 @@
 local skynet = require "skynet"
 local snax = require "snax"
-local table = require "table"
+
 
 local Mysql = {
-    db_pool = {}
+    mysql_sup = nil
 }
 
 local conf = {  
@@ -15,23 +15,27 @@ local conf = {
     max_packet_size = 1024 * 1024
 }
 
+function Mysql:new()
+    local o = {}
+    setmetatable(o, self)
+    self.__index = self
+    o.mysql_sup = snax.queryservice("mod_mysql_sup")
+    return o
+end
 
 function Mysql:init(cf)
     cf = cf or conf 
-    for i = 1, 10 do
-        local db = snax.newservice("mod_mysql",cf)
-        self.db_pool[i] = db
-    end
+    self.mysql_sup = snax.uniqueservice("mod_mysql_sup", cf)
 end
 
 function Mysql:query( ... )
-    if #self.db_pool > 0 then
-        local db = table.remove(self.db_pool, 1)
+    local handle = self.mysql_sup.req.acquire()
+    if handle > 0 then
+        local db = snax.bind(handle, "mod_mysql")
         local rs = db.req.query(...)
-        table.insert(self.db_pool, db)
+        self.mysql_sup.post.release(handle)
         return rs
     end
-    print("here")
     skynet.sleep(0.01)
     return self:query(...)
 end

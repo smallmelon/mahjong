@@ -1,9 +1,9 @@
 local snax = require "snax"
 
-local table = {
+local seat = {
     hallId = 0,
     roomId = 0,
-    tableId = 0,
+    seatId = 0,
     max = 0,
     min = 0,
     base = 0
