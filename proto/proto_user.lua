@@ -23,6 +23,18 @@ login 2 {
         code 0 : integer
     }
 }
+
+
+enter 3 {
+    request {
+        uid 0 : integer
+    }
+    response {
+        code 0 : integer
+    }
+}
+
+
 ]]
 
 proto.s2c = sprotoparser.parse [[

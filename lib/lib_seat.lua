@@ -1,7 +1,7 @@
 local snax = require "snax"
 
 local Seat = {
-    seat_sup = nil
+    seat_sup = nil,
     pid = nil
 }
 
@@ -24,7 +24,8 @@ function Seat:change( ... )
     -- if success
     if s then
         local handle = self.seat_sup.req.acquire()
-        s.pid = snax.bind(handle, "mod_seat")
+        self.pid = snax.bind(handle, "mod_seat")
+        self.pid.req.enter(...)
     end
     return r
 end
@@ -52,6 +53,7 @@ setmetatable(Seat, {__index = function (t, k)
         return self.pid.req[cmd](...) -- call seat service 
     end
     t[k] = f
+    return f
 end})
 
 return Seat

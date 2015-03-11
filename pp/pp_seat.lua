@@ -1,11 +1,13 @@
 local lib_player = require "lib_player"
 local lib_seat = require "lib_seat"
+local print_r = require "print_r"
 
 local Request = {
     
 }
 
 function Request:enter( ... ) -- 
+    print("enter")
     self.seat = lib_seat:new() -- client.seat = seat object
     return self.seat:enter(...)
 end
@@ -17,7 +19,7 @@ setmetatable(Request, {__index = function (t, k)
             print("error requst", ...)
             return {}
         end
-        return self.seat.[cmd](self.seat, ...) -- seat:cmd(...)
+        return self.seat[cmd](self.seat, ...) -- seat:cmd(...)
     end
     t[k] = f
     return f

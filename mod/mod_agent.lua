@@ -36,12 +36,12 @@ local function request(name, args, response)
                 end
             end                
         else
-            print("user not pass auth")
             socket.close(client.fd)
+            skynet.send(".watchdog", "lua", "close", client.fd)
             skynet.exit()
         end
     end
-    local r = f(args) 
+    local r = f(client, args) 
     if response then
         return response(r)
     end
@@ -96,7 +96,6 @@ end
 
 function CMD.close( ... )
     -- client close socket event
-    print("agent client socket close", client.fd)
     skynet.exit()
 end
 

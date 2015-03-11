@@ -8,8 +8,10 @@ function Request:register()
     return {uid = 10001, passwd = "what fuck", key = "secret key"}
 end
 
-function Request:login()
-    -- body
+function Request:login(msg)
+    print("login", msg.ver, msg.token)
+    self.auth = true
+    return  {code = 200}
 end
 
 function Request:player()

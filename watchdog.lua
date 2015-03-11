@@ -23,14 +23,18 @@ end
 
 function SOCKET.close(fd)
     print("socket close",fd)
-    skynet.call(agent[fd], "lua", "close")
-    close_agent(fd)
+    if agent[fd] then
+        skynet.send(agent[fd], "lua", "close")
+        close_agent(fd)
+    end
 end
 
 function SOCKET.error(fd, msg)
     print("socket error",fd, msg)
-    skynet.call(agent[fd], "lua", "close")
-    close_agent(fd)
+    if agent[fd] then
+        skynet.call(agent[fd], "lua", "close")
+        close_agent(fd)
+    end
 end
 
 function SOCKET.data(fd, msg)
@@ -39,6 +43,11 @@ end
 function CMD.start(conf)
     skynet.call(gate, "lua", "open" , conf)
 end
+
+function CMD.close(fd)
+    close_agent(fd)
+end
+
 
 skynet.start(function()
     skynet.dispatch("lua", function(session, source, cmd, subcmd, ...)
@@ -51,6 +60,6 @@ skynet.start(function()
             skynet.ret(skynet.pack(f(subcmd, ...)))
         end
     end)
-
+    skynet.register(".watchdog")
     gate = skynet.newservice("gate")
 end)

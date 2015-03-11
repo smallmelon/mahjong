@@ -1,7 +1,7 @@
 local snax = require "snax"
 
 local player = {
-    player_sup = nil
+    player_sup = nil,
     pid = nil
 }
 

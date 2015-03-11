@@ -97,12 +97,12 @@ local function dispatch_package()
 end
 
 send_request("handshake")
-send_request("register", { uuid = "hello", device = "iPhone 6 plus", channel = 11 })
+--send_request("login", { ver = 12, token = "iPhone 6 plus"})
 while true do
     dispatch_package()
     local cmd = socket.readstdin()
     if cmd then
-        send_request("get", { what = cmd })
+        send_request("enter", { uid = 1024 })
     else
         socket.usleep(100)
     end
