@@ -1,6 +1,6 @@
 local skynet = require "skynet"
 local netpack = require "netpack"
-local proto = require "proto_user"
+local proto = require "proto"
 
 local CMD = {}
 local SOCKET = {}

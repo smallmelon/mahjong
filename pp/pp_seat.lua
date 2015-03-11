@@ -8,7 +8,6 @@ local Request = {
 }
 
 function Request:enter( ... ) -- 
-    print("enter")
     self.seat = lib_seat:new() -- client.seat = seat object
     return self.seat:enter(skynet.self(), ...)
 end

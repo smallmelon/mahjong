@@ -8,4 +8,3 @@ function init(uid)
     redis = lib_redis:new()
     -- load data from redis database
 end
-

@@ -8,13 +8,13 @@ proto.c2s = sprotoparser.parse [[
     session 1 : integer
 }
 
-handshake 1 {
+user_handshake 1 {
     response {
         msg 0  : string
     }
 }
 
-login 2 {
+user_login 2 {
     request {
         ver 0 : integer
         token 1 : string
@@ -25,7 +25,7 @@ login 2 {
 }
 
 
-enter 3 {
+seat_enter 3 {
     request {
         uid 0 : integer
     }
@@ -45,7 +45,7 @@ proto.s2c = sprotoparser.parse [[
 
 heartbeat 1 {}
 
-enter 2 {
+seat_enter 2 {
     request {
         uid 0: integer
     }

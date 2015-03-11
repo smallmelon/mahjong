@@ -12,7 +12,7 @@ local host
 local send_request
 
 local CMD = {}
-local REQUEST = { PLAYER = pp_player, SEAT = pp_seat} -- process proto array
+local REQUEST = { user = pp_player, seat = pp_seat} -- process proto array
 
 local client = {
     fd = nil,
@@ -21,25 +21,31 @@ local client = {
     seat = nil
 }
 
+function router(name)
+    local pos = string.find(name, "_", 1, true)
+    if pos then
+        local pp = string.sub(name, 1, pos - 1)
+        local cmd = string.sub(name, pos + 1, #name)
+
+        if REQUEST[pp] and REQUEST[pp][cmd] then
+            if pp == "user" or client.auth then
+                return REQUEST[pp][cmd]
+            end
+        end
+    end
+    return nil
+end
+
 -- first auth
 -- game process
 
 local function request(name, args, response)
-    local f = REQUEST.PLAYER[name]
+    local f = router(name)
     if not f then
-        if client.auth then
-            f = assert(REQUEST.SEAT[name]) -- seat proto
-            if f then
-                local r = f(client, args)
-                if response then
-                    return response(r)
-                end
-            end                
-        else
-            socket.close(client.fd)
-            skynet.send(".watchdog", "lua", "close", client.fd)
-            skynet.exit()
-        end
+        print("request", name)
+        socket.close(client.fd)
+        skynet.send(".watchdog", "lua", "close", client.fd)
+        skynet.exit()
     end
     local r = f(client, args) 
     if response then
@@ -85,7 +91,6 @@ function CMD.start(gate, fd, proto)
     skynet.fork(function()
         while true do
             send_package(send_request "heartbeat")
-            print ("heartbeat")
             skynet.sleep(500)
         end
     end)
@@ -95,7 +100,6 @@ function CMD.start(gate, fd, proto)
 end
 
 function CMD.close( ... )
-    -- client close socket event
     skynet.exit()
 end
 

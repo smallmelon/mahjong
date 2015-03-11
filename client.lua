@@ -1,6 +1,6 @@
 local socket = require "clientsocket"
 local bit32 = require "bit32"
-local proto = require "proto_user"
+local proto = require "proto"
 local sproto = require "sproto"
 
 local host = sproto.new(proto.s2c):host "package"
@@ -96,13 +96,13 @@ local function dispatch_package()
     end
 end
 
-send_request("handshake")
-send_request("login", { ver = 12, token = "iPhone 6 plus"})
+send_request("user_handshake")
+send_request("user_login", { ver = 12, token = "iPhone 6 plus"})
 while true do
     dispatch_package()
     local cmd = socket.readstdin()
     if cmd then
-        send_request("enter", { uid = 1024 })
+        send_request("seat_enter", { uid = 1024 })
     else
         socket.usleep(100)
     end
