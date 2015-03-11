@@ -1,12 +1,18 @@
 local snax = require "snax"
 local skynet = require "skynet"
+local lib_mysql = require "lib_mysql"
+local lib_redis = require "lib_redis"
 
 
+
+local redis
+local mysql 
 local agents = {}
 local players = {}
 
 function init( ... )
-    -- body
+    redis = lib_redis:new()
+    mysql = lib_mysql:new()
 end
 
 function exit( ... )
@@ -57,4 +63,8 @@ function response.get_player(uid)
         return p.handle
     end
     return 0
+end
+
+
+function response.register( ... )
 end
