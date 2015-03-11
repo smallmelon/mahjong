@@ -36,7 +36,7 @@ end
 function response.enter(from,  msg)
     print("seat enter uid ", msg.uid)
     agents[msg.uid] = from
-    push_message(msg.uid, "send from seat", "helllo")
+    push_message(msg.uid, "enter", {uid = msg.uid})
     return {code = 200}
 end
 

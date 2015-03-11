@@ -101,8 +101,7 @@ end
 
 
 function CMD.push(name, msg)
-    print(name, msg)
-    --send_package(send_request(name, msg))
+    send_package(send_request(name, msg))
 end
 
 skynet.start(function()
