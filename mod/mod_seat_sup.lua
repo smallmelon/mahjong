@@ -17,7 +17,6 @@ function response.acquire()
     if #seats >= 1 then
         return table.remove(seats, 1)
     else
-        print("newservice")
         local seat = snax.newservice("mod_seat")
         table.insert(seats, seat.handle)
         return seat.handle

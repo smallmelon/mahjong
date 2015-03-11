@@ -97,7 +97,7 @@ local function dispatch_package()
 end
 
 send_request("handshake")
---send_request("login", { ver = 12, token = "iPhone 6 plus"})
+send_request("login", { ver = 12, token = "iPhone 6 plus"})
 while true do
     dispatch_package()
     local cmd = socket.readstdin()

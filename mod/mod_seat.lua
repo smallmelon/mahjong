@@ -1,4 +1,5 @@
 local snax = require "snax"
+local skynet = require "skynet"
 
 local seat = {
     hallId = 0,
@@ -11,6 +12,8 @@ local seat = {
 
 local players = {}
 
+local agents = {}
+
 function init(cf)
     -- body
 end
@@ -18,14 +21,22 @@ end
 function exit()
     -- body
 end
+
  
+function push_message(uid, name, msg)
+    if agents[uid] then
+        skynet.send(agents[uid], "lua", "push", name, msg)
+    end
+end
 
 function response.is_empty()
     return not next(players)
 end
 
-function response.enter(msg)
+function response.enter(from,  msg)
     print("seat enter uid ", msg.uid)
+    agents[msg.uid] = from
+    push_message(msg.uid, "send from seat", "helllo")
     return {code = 200}
 end
 
@@ -103,4 +114,10 @@ end
 
 function response.force_leave( ... )
     -- body
+end
+
+function push_message(uid, name, msg)
+    if agents[uid] then
+        skynet.call(agents[uid], "lua", "push", name, msg)
+    end
 end

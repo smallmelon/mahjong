@@ -100,9 +100,18 @@ function CMD.close( ... )
 end
 
 
+function CMD.push(name, msg)
+    print(name, msg)
+    --send_package(send_request(name, msg))
+end
+
 skynet.start(function()
     skynet.dispatch("lua", function(_,_, command, ...)
         local f = CMD[command]
-        skynet.ret(skynet.pack(f(...)))
+        if command ~= "push" then
+            skynet.ret(skynet.pack(f(...)))
+        else 
+            f(...)
+        end
     end)
 end)

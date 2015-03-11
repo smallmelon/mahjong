@@ -1,5 +1,5 @@
 local snax = require "snax"
-
+local skynet = require "skynet"
 local Seat = {
     seat_sup = nil,
     pid = nil
