@@ -15,20 +15,15 @@ local conf = {
     max_packet_size = 1024 * 1024
 }
 
-function Mysql:new()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-    o.mysql_sup = snax.queryservice("mod_mysql_sup")
-    return o
-end
-
 function Mysql:init(cf)
     cf = cf or conf 
     self.mysql_sup = snax.uniqueservice("mod_mysql_sup", cf)
 end
 
 function Mysql:query( ... )
+    if not self.mysql_sup then
+        self.mysql_sup = snax.queryservice("mod_mysql_sup")
+    end
     local handle = self.mysql_sup.req.acquire()
     if handle > 0 then
         local db = snax.bind(handle, "mod_mysql")

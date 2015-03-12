@@ -23,7 +23,8 @@ skynet.start(function ()
         nodelay = true,
     })
 
-    --skynet.newservice("test_mysql")
+    skynet.newservice("test_redis")
+    skynet.newservice("test_mysql")
 
     print("Watchdog listen on ", 10086)
 

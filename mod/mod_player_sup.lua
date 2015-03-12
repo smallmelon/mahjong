@@ -5,14 +5,10 @@ local lib_redis = require "lib_redis"
 
 
 
-local redis
-local mysql 
 local agents = {}
 local players = {}
 
 function init( ... )
-    redis = lib_redis:new()
-    mysql = lib_mysql:new()
 end
 
 function exit( ... )

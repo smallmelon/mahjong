@@ -25,15 +25,6 @@ local conf = {
 }
 
 
-function Redis:new()
-    local o = {}
-    setmetatable(o, self)
-    self.__index = self
-    
-    o.redis_sup = snax.queryservice("mod_redis_sup")
-    return o
-end
-
 function Redis:init(cf)
     cf = cf or conf
     self.redis_sup = snax.uniqueservice("mod_redis_sup", cf)
@@ -41,7 +32,9 @@ end
 
 setmetatable(Redis, { __index = function (t, k)
     local cmd = string.lower(k)
-    local f = function (self,  ... )
+    print(cmd)
+    Redis.redis_sup = snax.queryservice("mod_redis_sup")
+    local f = function (self, ... )
         local handle, pos = self.redis_sup.req.acquire(...)
         if handle > 0 then
             local db = snax.bind(handle, "mod_redis")
@@ -55,5 +48,6 @@ setmetatable(Redis, { __index = function (t, k)
     t[k] = f
     return f
 end})
+
 
 return Redis
