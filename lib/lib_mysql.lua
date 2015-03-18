@@ -3,7 +3,8 @@ local snax = require "snax"
 
 
 local Mysql = {
-    mysql_sup = nil
+    mysql_sup = nil,
+    pool = {}
 }
 
 
@@ -17,7 +18,11 @@ function Mysql:query( ... )
     end
     local handle = self.mysql_sup.req.acquire()
     if handle > 0 then
-        local db = snax.bind(handle, "mod_mysql")
+        local db = self.pool[handle]
+        if not db then
+            db = snax.bind(handle, "mod_mysql")
+            self.pool[handle] = db
+        end
         local rs = db.req.query(...)
         self.mysql_sup.post.release(handle)
         return rs

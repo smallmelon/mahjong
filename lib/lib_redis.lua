@@ -4,9 +4,9 @@ local snax = require "snax"
 local print_r = require "print_r"
 
 
-
 local Redis = {
-    redis_sup = nil
+    redis_sup = nil,
+    pool = {}
 }
 
 
@@ -16,12 +16,15 @@ end
 
 setmetatable(Redis, { __index = function (t, k)
     local cmd = string.lower(k)
-    print(cmd)
     Redis.redis_sup = snax.queryservice("mod_redis_sup")
     local f = function (self, ... )
-        local handle, pos = self.redis_sup.req.acquire(...)
+        local handle, pos = self.redis_sup.req.acquire(select(1, ...))
         if handle > 0 then
-            local db = snax.bind(handle, "mod_redis")
+            local db = self.pool[handle]
+            if not db then
+                db = snax.bind(handle, "mod_redis")
+                self.pool[handle] = db
+            end
             local rs = db.req.cmd(cmd, ...)
             self.redis_sup.post.release(handle, pos)
             return rs

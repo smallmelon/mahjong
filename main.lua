@@ -15,7 +15,8 @@ skynet.start(function ()
         maxclient = max_client,
         nodelay = true,
     })
-
+    
+    skynet.newservice("test")
     print("Watchdog listen on ", 10086)
 
     skynet.exit()

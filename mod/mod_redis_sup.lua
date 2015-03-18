@@ -3,7 +3,9 @@ local string = require "string"
 local snax = require "snax"
 
 
-local db_pool = {}
+local db_pool = {
+    count = nil
+}
 
 
 function hash_key(key)
@@ -14,13 +16,25 @@ function hash_key(key)
     return value
 end
 
-function choice_pos(...)
-    local hash_value = hash_key(select(1, ...))
-    return hash_value % (#db_pool) + 1
+function get_uid(key)
+    local pos = string.find(key, "uid:")
+    if pos then
+        return tonumber(string.sub(key, pos + 4, #key))
+    end
+    return false
+end
+
+function choice_pos(key)
+    local uid = get_uid(key)
+    if not uid then
+        uid = hash_key(key)
+    end
+    return uid % db_pool.count + 1
 end
 
 
 function init(cf)
+    db_pool.count = #cf
     for i = 1, #cf do
         local dbs = {}
         for j = 1, 3 do
@@ -43,8 +57,8 @@ function exit()
     db_pool = {}
 end
 
-function response.acquire(...)
-    local pos = choice_pos(...)
+function response.acquire(key)
+    local pos = choice_pos(key)
     local dbs = db_pool[pos]
     if #dbs > 0 then
         return table.remove(dbs, 1), pos
