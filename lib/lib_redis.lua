@@ -9,24 +9,8 @@ local Redis = {
     redis_sup = nil
 }
 
-local conf = {
-    {
-        host = "127.0.0.1" ,
-        port = 6379 ,
-        db = 0,
-        auth = "_jiami2013"
-    },
-    {
-        host = "127.0.0.1" ,
-        port = 6380 ,
-        db = 0,
-        auth = "_jiami2013"
-    }
-}
-
 
 function Redis:init(cf)
-    cf = cf or conf
     self.redis_sup = snax.uniqueservice("mod_redis_sup", cf)
 end
 
@@ -42,7 +26,7 @@ setmetatable(Redis, { __index = function (t, k)
             self.redis_sup.post.release(handle, pos)
             return rs
         end
-        skynet.sleep(0.01)
+        skynet.sleep(0.001)
         return f(self, ...)
     end
     t[k] = f

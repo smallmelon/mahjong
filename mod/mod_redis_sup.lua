@@ -23,7 +23,7 @@ end
 function init(cf)
     for i = 1, #cf do
         local dbs = {}
-        for j = 1, 5 do
+        for j = 1, 3 do
             local db = snax.newservice("mod_redis", cf[i])
             dbs[j] = db.handle
         end

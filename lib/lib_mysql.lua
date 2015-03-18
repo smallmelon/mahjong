@@ -6,17 +6,8 @@ local Mysql = {
     mysql_sup = nil
 }
 
-local conf = {  
-    host="127.0.0.1",
-    port=3306,
-    database="mhjong",
-    user="root",
-    password="",
-    max_packet_size = 1024 * 1024
-}
 
-function Mysql:init(cf)
-    cf = cf or conf 
+function Mysql:init(cf) 
     self.mysql_sup = snax.uniqueservice("mod_mysql_sup", cf)
 end
 
@@ -31,7 +22,7 @@ function Mysql:query( ... )
         self.mysql_sup.post.release(handle)
         return rs
     end
-    skynet.sleep(0.01)
+    skynet.sleep(0.001)
     return self:query(...)
 end
 
