@@ -3,7 +3,7 @@ local netpack = require "netpack"
 local socket = require "socket"
 local sproto = require "sproto"
 local bit32 = require "bit32"
-local lib_redis = require "lib_redis"
+
 
 -- request process
 local pp_player = require "pp_player"
@@ -106,8 +106,14 @@ end
 
 
 function CMD.push(name, msg)
-    print_r(lib_redis:hmget("mykey", "a", "b", "c"))
     send_package(send_request(name, msg))
+end
+
+function CMD.player(cmd, ...)
+    local f = client.player[cmd]
+    if f then
+        return f(...)
+    end
 end
 
 skynet.start(function()
