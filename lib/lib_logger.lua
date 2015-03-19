@@ -3,17 +3,21 @@ local string = require "string"
 local lib_time = require "lib_time"
 local netpack = require "netpack"
 local core = require "skynet.core"
-
+local snax = require "snax"
+local lib_utils = require "lib_utils"
 
 local Logger = {
     level = 0,
     logger = nil,
     time = nil,
     file = "",
+    filename = "",
     levels = { "DEBUG", "INFO", "WARN", "ERROR","FATAL" }
 }
 
-
+function Logger:init()
+    snax.uniqueservice("mod_logger_sup")
+end
 
 function Logger:new(file)
     local o = {}
@@ -21,6 +25,7 @@ function Logger:new(file)
     self.__index = self
     o.time = lib_time:new()
     o.file = file
+    o.logger_sup = snax.queryservice("mod_logger_sup")
     o:open()
     return o
 end
@@ -28,8 +33,12 @@ end
 function Logger:open()
     local date = self.time:date("%x")
     local file = self.file.."-"..date..".log"
-    print(file)
-    self.logger = skynet.launch("logger", file)
+    local logger = self.logger_sup.req.get(file)
+    if not logger then
+        logger = self.logger_sup.req.create(file)
+    end
+    self.filename = file
+    self.logger = logger
 end
 
 function Logger:set_level(level)
@@ -37,15 +46,15 @@ function Logger:set_level(level)
 end
 
 function Logger:log(level, ... )
-    local s = string.format(...)
     local time = lib_time:new()
     local date = time:date()
-
-    s = "[" .. date .. "] [" .. self.levels[level] .. "] " .. s
+    
+    local s = lib_utils.format(...)
+    s = string.format("[%s] [%s] %s", date, self.levels[level], s)
     core.send(self.logger, 0, 0, s)    
 
     if time:date("%d") ~= self.time:date("%d") then
-        skynet.kill(self.logger)
+        self.logger_sup.post.close(self.filename)
         self.time = time
         self:open()
     end

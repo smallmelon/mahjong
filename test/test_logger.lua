@@ -1,20 +1,18 @@
 local logger = require "lib_logger"
 local skynet = require "skynet"
+local cf = ...
+print(cf)
 
-local test = {}
-
-function  test:test( ... )
-    log = logger:new("./mahjong/logs/test")
+skynet.start(function ()
+    local log = logger:new("./mahjong/logs/test")
     log:set_level(4)
-    while (1) do
-        log:debug("debug log")
-        log:warn("warn log")
-        log:info("info log")
-        log:error("error log")
-        log:fatal("fatal log")
-        skynet.sleep(0.1)
+    function f ()
+        log:debug("debug log"..cf)
+        log:warn("warn log"..cf)
+        log:info("info log"..cf)
+        log:error("error log"..cf)
+        log:fatal("fatal log"..cf) 
+        skynet.timeout(300, f)
     end
-
-end
-
-return test
+    skynet.timeout(300, f)
+end)

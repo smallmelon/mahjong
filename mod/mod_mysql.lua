@@ -1,23 +1,16 @@
 local skynet = require "skynet"
 local snax = require "snax"
 local mysql = require "mysql"
-
-local conf = {  
-    host="127.0.0.1",
-    port=3306,
-    database="mhjong",
-    user="root",
-    password="",
-    max_packet_size = 1024 * 1024
-}
+local lib_logger = require "lib_logger"
 
 local db
+local logger 
 
 function init(cf)
-    cf = cf or conf
+    logger = lib_logger:new("./mahjong/logs/mysql")
     db = mysql.connect(cf)
     if not db then
-        print("failed to connect")
+        logger:error("failed to connect mysql", table.unpack(cf))
     end
 end
 
@@ -26,5 +19,6 @@ function exit()
 end
 
 function response.query( ... )
+    logger:debug(...)
     return db:query(...)
 end

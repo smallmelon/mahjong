@@ -16,7 +16,6 @@ end
 local function close_agent(fd)
     local a = agent[fd]
     if a then
-        skynet.kill(a)
         agent[fd] = nil
     end
 end
@@ -32,7 +31,7 @@ end
 function SOCKET.error(fd, msg)
     print("socket error",fd, msg)
     if agent[fd] then
-        skynet.call(agent[fd], "lua", "close")
+        skynet.send(agent[fd], "lua", "close")
         close_agent(fd)
     end
 end

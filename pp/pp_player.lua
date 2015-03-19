@@ -1,15 +1,13 @@
-local bit32 = require "bit32"
+local lib_player = require "lib_player"
 
 local Request = {}
 
-
-function Request:register()
-    print("register", self.device, self.uuid, self.channel)
-    return {uid = 10001, passwd = "what fuck", key = "secret key"}
-end
-
 function Request:login(msg)
     print("login", msg.ver, msg.token)
+    local player = lib_player:new()
+    player:get_info_from_redis(msg.ver)
+    --player:set_info_to_redis()
+    self.player = player
     self.auth = true
     return  {code = 200}
 end
