@@ -1,5 +1,8 @@
 local snax = require "snax"
 local skynet = require "skynet"
+local lib_logger = require "lib_logger"
+
+local logger
 
 local seat = {
     hallId = 0,
@@ -15,7 +18,7 @@ local players = {}
 local agents = {}
 
 function init(cf)
-    -- body
+    logger = lib_logger:new("./mahjong/logs/seat")
 end
 
 function exit()
