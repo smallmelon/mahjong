@@ -10,7 +10,7 @@ function Time:new()
     local o = {}
     setmetatable(o, self)
     self.__index = self
-    o.time = skynet.time()
+    o.time = math.ceil(skynet.time())
     return o
 end
 
@@ -24,6 +24,8 @@ function Time:date(fmt, time)
         s =  os.date("%x %X",self.time)
     elseif not time then
         time = self.time
+        s = os.date(fmt, time)
+    else
         s = os.date(fmt, time)
     end
     return string.gsub(s, "/", "-")
