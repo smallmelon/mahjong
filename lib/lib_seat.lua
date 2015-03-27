@@ -1,5 +1,6 @@
 local snax = require "snax"
 local skynet = require "skynet"
+
 local Seat = {
     seat_sup = nil,
     pid = nil
@@ -13,8 +14,13 @@ function Seat:new()
     o = {}
     setmetatable(o, self)
     self.__index = self
-    o.seat_sup = snax.queryservice("mod_seat_sup")
-    local handle = o.seat_sup.req.acquire()
+    local seat_sup = snax.queryservice("mod_seat_sup")
+    if not seat_sup then 
+        skynet.error('seat_sup queryservice return nil')
+        return nil
+    end
+    o.seat_sup = seat_sup
+    local handle = seat_sup.req.acquire()
     o.pid = snax.bind(handle, "mod_seat")
     return o
 end
@@ -31,11 +37,10 @@ function Seat:change( ... )
 end
 
 function Seat:leave( ... )
-    local s , r = self.pid.req.leave(...)
-    if s then
+    if self.pid then
+        self.pid.post.leave(...)
         self.pid = nil
     end
-    return r
 end
 
 function Seat:leave_force( ... )

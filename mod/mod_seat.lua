@@ -3,7 +3,7 @@ local skynet = require "skynet"
 local lib_logger = require "lib_logger"
 
 local logger
-
+local seat_sup
 local seat = {
     hallId = 0,
     roomId = 0,
@@ -19,6 +19,7 @@ local agents = {}
 
 function init(cf)
     logger = lib_logger:new("./mahjong/logs/seat")
+    seat_sup = snax.queryservice("mod_seat_sup")
 end
 
 function exit()
@@ -37,7 +38,7 @@ function response.is_empty()
 end
 
 function response.enter(from,  msg)
-    print("seat enter uid ", msg.uid)
+    logger:debug("seat enter uid ", msg.uid)
     agents[msg.uid] = from
     push_message(msg.uid, "seat_enter", {uid = msg.uid})
     return {code = 200}
@@ -111,16 +112,17 @@ function response.confirmwin( ... )
     -- body
 end
 
-function response.leave( ... )
-    -- body
+function accept.leave(msg)
+    logger:debug("seat leave uid", msg.uid)
+    agents[msg.uid] = nil
+    if next(agents) then
+        seat_sup.post.release(skynet.self()) 
+    else
+        seat_sup.post.remove(skynet.self())
+        snax.exit()
+    end
 end
 
 function response.force_leave( ... )
     -- body
-end
-
-function push_message(uid, name, msg)
-    if agents[uid] then
-        skynet.call(agents[uid], "lua", "push", name, msg)
-    end
 end

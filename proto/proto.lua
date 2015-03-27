@@ -16,16 +16,32 @@ user_handshake 1 {
 
 user_login 2 {
     request {
-        ver 0 : integer
-        token 1 : string
+        uid 0 : integer
+        passwd 1 : string
     }
     response {
         code 0 : integer
+        gold 1 : integer
+        diamond 2 : integer
+        icon_url 3 : string
+        sex 4 : integer
+        nickname 5 : string
+        uid 6 : integer
     }
 }
 
+user_register 3 {
+    request {
+        uuid 0 : string
+        channel 1 : integer
+    }
+    response {
+        code 0 : integer
+        uid 1 : integer
+    }
+}
 
-seat_enter 3 {
+seat_enter 4 {
     request {
         uid 0 : integer
     }
@@ -34,6 +50,14 @@ seat_enter 3 {
     }
 }
 
+seat_leave 5 {
+    request {
+        uid 0 : integer
+    }
+    response {
+        code 0 : integer
+    }
+}
 
 ]]
 
@@ -45,9 +69,16 @@ proto.s2c = sprotoparser.parse [[
 
 heartbeat 1 {}
 
-seat_enter 2 {
+user_push 2 {
     request {
-        uid 0: integer
+        uid 0 : integer
+        name 1 : string
+    }
+}
+
+seat_enter 3 {
+    request {
+        uid 0 : integer
     }
 }
 ]]

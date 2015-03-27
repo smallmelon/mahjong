@@ -23,12 +23,15 @@ function response.acquire()
     end
 end
 
-
 function accept.release(handle)
-    local seat = snax.bind(handle, "mod_seat")
-    if seat.req.is_empty() then
-        snax.kill(seat)
-    else
-        table.insert(seats, handle)
+    table.insert(seats, handle)
+end
+
+function accept.remove(handle)
+    for i=1 , #seats do
+        if seats[i] == handle then
+            table.remove(seats, i)
+            return
+        end
     end
 end

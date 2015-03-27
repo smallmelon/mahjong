@@ -5,8 +5,8 @@ local snax = require "snax"
 local db_pool = {}
 
 function init(cf)
-    for i = 1, 5 do 
-        local db = snax.newservice("mod_mysql", cf)
+    for i = 1, 2 do 
+        local db = snax.newservice("mod_mysql", cf, 10)
         db_pool[i] = db.handle
     end
 end
@@ -20,12 +20,5 @@ function exit()
 end
 
 function response.acquire()
-    if #db_pool > 0 then
-        return table.remove(db_pool, 1)
-    end
-    return 0
-end
-
-function accept.release(handle)
-    table.insert(db_pool, handle)
+    return db_pool
 end

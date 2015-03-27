@@ -12,6 +12,14 @@ function Request:enter( ... ) --
     return self.seat:enter(skynet.self(), ...)
 end
 
+function Request:leave(...)
+    if self.seat then
+        self.seat:leave(...)
+        self.seat = nil
+    end
+    return {code = 200}
+end
+
 setmetatable(Request, {__index = function (t, k)
     local cmd = string.lower(k)
     local  f = function (self, ... )

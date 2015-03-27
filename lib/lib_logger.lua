@@ -45,11 +45,10 @@ function Logger:set_level(level)
     self.level = level
 end
 
-function Logger:log(level, ... )
+function Logger:log(level, fmt, ... )
     local time = lib_time:new()
     local date = time:date()
-    
-    local s = lib_utils.format(...)
+    local s = lib_utils.format(fmt, ...)
     s = string.format("[%s] [%s] %s", date, self.levels[level], s)
     core.send(self.logger, 0, 0, s)    
 

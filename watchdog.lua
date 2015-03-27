@@ -1,6 +1,7 @@
 local skynet = require "skynet"
 local netpack = require "netpack"
 local proto = require "proto"
+local socket = require "socket"
 
 local CMD = {}
 local SOCKET = {}
@@ -37,6 +38,8 @@ function SOCKET.error(fd, msg)
 end
 
 function SOCKET.data(fd, msg)
+    print(msg)
+    socket.write(fd, "send from server")
 end
 
 function CMD.start(conf)

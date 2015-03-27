@@ -3,42 +3,13 @@ local string = require "string"
 local snax = require "snax"
 
 
-local db_pool = {
-    count = nil
-}
-
-
-function hash_key(key)
-    local value = 0
-    for i=1, #key do
-        value = value + string.byte(key, i)
-    end
-    return value
-end
-
-function get_uid(key)
-    local pos = string.find(key, "uid:")
-    if pos then
-        return tonumber(string.sub(key, pos + 4, #key))
-    end
-    return false
-end
-
-function choice_pos(key)
-    local uid = get_uid(key)
-    if not uid then
-        uid = hash_key(key)
-    end
-    return uid % db_pool.count + 1
-end
-
+local db_pool = {}
 
 function init(cf)
-    db_pool.count = #cf
     for i = 1, #cf do
         local dbs = {}
-        for j = 1, 3 do
-            local db = snax.newservice("mod_redis", cf[i])
+        for j = 1, 2 do
+            local db = snax.newservice("mod_redis", cf[i], 10)
             dbs[j] = db.handle
         end
         db_pool[i] = dbs
@@ -57,16 +28,6 @@ function exit()
     db_pool = {}
 end
 
-function response.acquire(key)
-    local pos = choice_pos(key)
-    local dbs = db_pool[pos]
-    if #dbs > 0 then
-        return table.remove(dbs, 1), pos
-    end
-    return 0, 0
+function response.acquire()
+    return db_pool
 end
-
-function accept.release(handle, pos)
-    local dbs = db_pool[pos]
-    table.insert(dbs, handle)
-end 

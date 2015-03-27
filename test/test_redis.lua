@@ -1,6 +1,6 @@
 local lib_redis = require "lib_redis"
 local skynet = require "skynet"
-
+local redis = require "redis"
 local test = {}
 
 function test:hmget(n)
